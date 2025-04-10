@@ -3,26 +3,23 @@ class Node:
         self.left = None
         self.right = None
         self.key = key
-        self.height = 1  # height of the node
+        self.height = 1 
 
 
 class AVLTree:
     def __init__(self):
         self.root = None
 
-    # Pomocnicza funkcja do obliczania wysokości węzła
     def height(self, node):
         if node is None:
             return 0
         return node.height
 
-    # Pomocnicza funkcja do obliczania różnicy wysokości lewego i prawego poddrzewa
     def balance_factor(self, node):
         if node is None:
             return 0
         return self.height(node.left) - self.height(node.right)
 
-    # Rotacja w prawo
     def right_rotate(self, y):
         x = y.left
         T2 = x.right
@@ -32,7 +29,6 @@ class AVLTree:
         x.height = max(self.height(x.left), self.height(x.right)) + 1
         return x
 
-    # Rotacja w lewo
     def left_rotate(self, x):
         y = x.right
         T2 = y.left
@@ -42,17 +38,14 @@ class AVLTree:
         y.height = max(self.height(y.left), self.height(y.right)) + 1
         return y
 
-    # Balansowanie drzewa
     def balance(self, node):
         balance_factor = self.balance_factor(node)
 
-        # Zbyt duża równowaga w lewym poddrzewie
         if balance_factor > 1:
             if self.balance_factor(node.left) < 0:
                 node.left = self.left_rotate(node.left)
             return self.right_rotate(node)
 
-        # Zbyt duża równowaga w prawym poddrzewie
         if balance_factor < -1:
             if self.balance_factor(node.right) > 0:
                 node.right = self.right_rotate(node.right)
@@ -60,7 +53,6 @@ class AVLTree:
 
         return node
 
-    # Wstawianie elementu
     def insert(self, node, key):
         if not node:
             return Node(key)
@@ -73,7 +65,6 @@ class AVLTree:
         node.height = 1 + max(self.height(node.left), self.height(node.right))
         return self.balance(node)
 
-    # Usuwanie elementu
     def delete(self, node, key):
         if not node:
             return node
@@ -95,13 +86,11 @@ class AVLTree:
         node.height = 1 + max(self.height(node.left), self.height(node.right))
         return self.balance(node)
 
-    # Funkcja zwracająca najmniejszy węzeł
     def get_min_value_node(self, node):
         if node is None or node.left is None:
             return node
         return self.get_min_value_node(node.left)
 
-    # Funkcja wyszukiwania najmniejszego elementu i zwrócenie ścieżki
     def find_min(self):
         node = self.get_min_value_node(self.root)
         if node:
@@ -110,7 +99,6 @@ class AVLTree:
             return node.key, path
         return None, []
 
-    # Funkcja wyszukiwania największego elementu i zwrócenie ścieżki
     def find_max(self):
         node = self.root
         path = []
@@ -122,7 +110,6 @@ class AVLTree:
                 break
         return node.key, path
 
-    # Pomocnicza funkcja do znajdowania ścieżki do najmniejszego elementu
     def _find_min_path(self, node, key, path):
         if node is None:
             return False
@@ -134,21 +121,18 @@ class AVLTree:
         else:
             return self._find_min_path(node.right, key, path)
 
-    # Funkcja do wyświetlania drzewa w porządku in-order
     def inorder(self, node):
         if node:
             self.inorder(node.left)
             print(node.key, end=" ")
             self.inorder(node.right)
 
-    # Funkcja do wyświetlania drzewa w porządku pre-order
     def preorder(self, node):
         if node:
             print(node.key, end=" ")
             self.preorder(node.left)
             self.preorder(node.right)
 
-    # Usuwanie całego drzewa (metoda post-order)
     def delete_tree(self, node):
         if node:
             self.delete_tree(node.left)
@@ -156,7 +140,6 @@ class AVLTree:
             print(f"Usunięto: {node.key}")
             del node
 
-    # Metoda do balansowania drzewa metodą DSW
     def dsw_balance(self):
         nodes = []
         self.flatten_tree(self.root, nodes)
@@ -182,7 +165,6 @@ class AVLTree:
 
         return build(0, len(nodes) - 1)
 
-    # Funkcja do dodawania elementów do drzewa
     def add(self, key):
         self.root = self.insert(self.root, key)
 
