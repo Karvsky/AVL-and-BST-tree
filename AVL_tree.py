@@ -1,26 +1,29 @@
-class AVLNode:
+class Node:
     def __init__(self, key):
-        self.key = key
         self.left = None
         self.right = None
-        self.height = 1
+        self.key = key
+        self.height = 1  # height of the node
 
 
 class AVLTree:
     def __init__(self):
         self.root = None
 
+    # Pomocnicza funkcja do obliczania wysokości węzła
     def height(self, node):
         if node is None:
             return 0
         return node.height
 
+    # Pomocnicza funkcja do obliczania różnicy wysokości lewego i prawego poddrzewa
     def balance_factor(self, node):
         if node is None:
             return 0
         return self.height(node.left) - self.height(node.right)
 
-    def rotate_right(self, y):
+    # Rotacja w prawo
+    def right_rotate(self, y):
         x = y.left
         T2 = x.right
         x.right = y
@@ -29,7 +32,8 @@ class AVLTree:
         x.height = max(self.height(x.left), self.height(x.right)) + 1
         return x
 
-    def rotate_left(self, x):
+    # Rotacja w lewo
+    def left_rotate(self, x):
         y = x.right
         T2 = y.left
         y.left = x
@@ -38,177 +42,215 @@ class AVLTree:
         y.height = max(self.height(y.left), self.height(y.right)) + 1
         return y
 
+    # Balansowanie drzewa
     def balance(self, node):
-        balance = self.balance_factor(node)
+        balance_factor = self.balance_factor(node)
 
-        if balance > 1:
+        # Zbyt duża równowaga w lewym poddrzewie
+        if balance_factor > 1:
             if self.balance_factor(node.left) < 0:
-                node.left = self.rotate_left(node.left)
-            return self.rotate_right(node)
+                node.left = self.left_rotate(node.left)
+            return self.right_rotate(node)
 
-        if balance < -1:
+        # Zbyt duża równowaga w prawym poddrzewie
+        if balance_factor < -1:
             if self.balance_factor(node.right) > 0:
-                node.right = self.rotate_right(node.right)
-            return self.rotate_left(node)
+                node.right = self.right_rotate(node.right)
+            return self.left_rotate(node)
 
         return node
 
-    def insert(self, root, key):
-        if root is None:
-            return AVLNode(key)
+    # Wstawianie elementu
+    def insert(self, node, key):
+        if not node:
+            return Node(key)
 
-        if key < root.key:
-            root.left = self.insert(root.left, key)
+        if key < node.key:
+            node.left = self.insert(node.left, key)
         else:
-            root.right = self.insert(root.right, key)
+            node.right = self.insert(node.right, key)
 
-        root.height = 1 + max(self.height(root.left), self.height(root.right))
-        return self.balance(root)
+        node.height = 1 + max(self.height(node.left), self.height(node.right))
+        return self.balance(node)
 
-    def search(self, root, key):
-        if root is None or root.key == key:
-            return root
+    # Usuwanie elementu
+    def delete(self, node, key):
+        if not node:
+            return node
 
-        if key < root.key:
-            return self.search(root.left, key)
-        return self.search(root.right, key)
-
-    def delete(self, root, key):
-        if root is None:
-            return root
-
-        if key < root.key:
-            root.left = self.delete(root.left, key)
-        elif key > root.key:
-            root.right = self.delete(root.right, key)
+        if key < node.key:
+            node.left = self.delete(node.left, key)
+        elif key > node.key:
+            node.right = self.delete(node.right, key)
         else:
-            if root.left is None:
-                return root.right
-            elif root.right is None:
-                return root.left
+            if node.left is None:
+                return node.right
+            elif node.right is None:
+                return node.left
 
-            temp = self.get_min_value_node(root.right)
-            root.key = temp.key
-            root.right = self.delete(root.right, temp.key)
+            min_node = self.get_min_value_node(node.right)
+            node.key = min_node.key
+            node.right = self.delete(node.right, min_node.key)
 
-        root.height = 1 + max(self.height(root.left), self.height(root.right))
-        return self.balance(root)
+        node.height = 1 + max(self.height(node.left), self.height(node.right))
+        return self.balance(node)
 
-    def get_min_value_node(self, root):
-        if root is None or root.left is None:
-            return root
-        return self.get_min_value_node(root.left)
+    # Funkcja zwracająca najmniejszy węzeł
+    def get_min_value_node(self, node):
+        if node is None or node.left is None:
+            return node
+        return self.get_min_value_node(node.left)
 
-    def in_order(self, root):
-        return self.in_order(root.left) + [root.key] + self.in_order(root.right) if root else []
+    # Funkcja wyszukiwania najmniejszego elementu i zwrócenie ścieżki
+    def find_min(self):
+        node = self.get_min_value_node(self.root)
+        if node:
+            path = []
+            self._find_min_path(self.root, node.key, path)
+            return node.key, path
+        return None, []
 
-    def pre_order(self, root):
-        return [root.key] + self.pre_order(root.left) + self.pre_order(root.right) if root else []
-
-    def post_order(self, root):
-        return self.post_order(root.left) + self.post_order(root.right) + [root.key] if root else []
-
-    def print_search_path(self, root, key):
+    # Funkcja wyszukiwania największego elementu i zwrócenie ścieżki
+    def find_max(self):
+        node = self.root
         path = []
-        while root:
-            path.append(root.key)
-            if key < root.key:
-                root = root.left
-            elif key > root.key:
-                root = root.right
+        while node:
+            path.append(node.key)
+            if node.right:
+                node = node.right
             else:
                 break
-        return path
+        return node.key, path
 
-    def print_in_order(self):
-        return self.in_order(self.root)
+    # Pomocnicza funkcja do znajdowania ścieżki do najmniejszego elementu
+    def _find_min_path(self, node, key, path):
+        if node is None:
+            return False
+        path.append(node.key)
+        if node.key == key:
+            return True
+        elif key < node.key:
+            return self._find_min_path(node.left, key, path)
+        else:
+            return self._find_min_path(node.right, key, path)
 
-    def print_pre_order(self):
-        return self.pre_order(self.root)
+    # Funkcja do wyświetlania drzewa w porządku in-order
+    def inorder(self, node):
+        if node:
+            self.inorder(node.left)
+            print(node.key, end=" ")
+            self.inorder(node.right)
 
-    def print_post_order(self):
-        return self.post_order(self.root)
+    # Funkcja do wyświetlania drzewa w porządku pre-order
+    def preorder(self, node):
+        if node:
+            print(node.key, end=" ")
+            self.preorder(node.left)
+            self.preorder(node.right)
+
+    # Usuwanie całego drzewa (metoda post-order)
+    def delete_tree(self, node):
+        if node:
+            self.delete_tree(node.left)
+            self.delete_tree(node.right)
+            print(f"Usunięto: {node.key}")
+            del node
+
+    # Metoda do balansowania drzewa metodą DSW
+    def dsw_balance(self):
+        nodes = []
+        self.flatten_tree(self.root, nodes)
+        self.root = self.build_balanced_tree(nodes)
+
+    def flatten_tree(self, node, nodes):
+        if node:
+            self.flatten_tree(node.left, nodes)
+            nodes.append(node)
+            node.left = None
+            self.flatten_tree(node.right, nodes)
+
+    def build_balanced_tree(self, nodes):
+        def build(start, end):
+            if start > end:
+                return None
+            mid = (start + end) // 2
+            node = nodes[mid]
+            node.left = build(start, mid - 1)
+            node.right = build(mid + 1, end)
+            node.height = 1 + max(self.height(node.left), self.height(node.right))
+            return node
+
+        return build(0, len(nodes) - 1)
+
+    # Funkcja do dodawania elementów do drzewa
+    def add(self, key):
+        self.root = self.insert(self.root, key)
 
 
 def menu():
     tree = AVLTree()
     while True:
-        print("\n1. Wstaw element")
-        print("2. Wyszukaj element")
-        print("3. Usun element")
-        print("4. Wypisz drzewo w porzadku in-order")
-        print("5. Wypisz drzewo w porzadku pre-order")
-        print("6. Wypisz drzewo w porzadku post-order")
-        print("7. Usun cale drzewo")
-        print("8. Wywaz drzewo")
-        print("9. Zakoncz")
+        print("\nMenu:")
+        print("1. Wstaw element do drzewa")
+        print("2. Wyszukaj najmniejszy element")
+        print("3. Wyszukaj największy element")
+        print("4. Usun element")
+        print("5. Wypisz drzewo w porządku in-order")
+        print("6. Wypisz drzewo w porządku pre-order")
+        print("7. Usuń całe drzewo")
+        print("8. Balansowanie drzewa (algorytm DSW)")
+        print("9. Wyjście")
 
-        option = input("Wybierz opcje: ")
+        choice = input("Wybierz opcję: ")
 
-        if option == '1':
-            n = int(input("Ile elementow chcesz wstawic? (maksymalnie 10) "))
-            if n > 10:
-                print("Maksymalna liczba elementow to 10. Zostalo wstawionych 10 elementow.")
-                n = 10
-            for i in range(n):
-                while True:
-                    try:
-                        key = int(input("Wpisz element (liczba calkowita): "))
-                        tree.root = tree.insert(tree.root, key)
-                        break
-                    except ValueError:
-                        print("Blad: Wpisz prawidlowa liczbe calkowita.")
-            print("Elementy zostaly dodane.")
-
-        elif option == '2':
-            try:
-                key = int(input("Podaj wartosc do wyszukania: "))
-                path = tree.print_search_path(tree.root, key)
-                print(f"Sciezka do {key}: {path}")
-            except ValueError:
-                print("Blad: Wpisz prawidlowa liczbe calkowita.")
-
-        elif option == '3':
-            try:
-                n = int(input("Ile elementow chcesz usunac? "))
-                if n > 10:
-                    print("Maksymalna liczba elementow to 10. Zostalo usunietych 10 elementow.")
-                    n = 10
+        try:
+            if choice == "1":
+                n = int(input("Ile elementów chcesz dodać? "))
                 for _ in range(n):
-                    while True:
-                        try:
-                            key = int(input("Podaj wartosc do usuniecia: "))
-                            tree.root = tree.delete(tree.root, key)
-                            break
-                        except ValueError:
-                            print("Blad: Wpisz prawidlowa liczbe calkowita.")
-                print("Elementy zostaly usuniete.")
-            except ValueError:
-                print("Blad: Wpisz prawidlowa liczbe calkowita.")
+                    key = int(input("Podaj wartość klucza: "))
+                    tree.add(key)
 
-        elif option == '4':
-            print(f"Drzewo w porzadku in-order: {tree.print_in_order()}")
+            elif choice == "2":
+                min_value, path = tree.find_min()
+                if min_value:
+                    print(f"Najmniejszy element: {min_value} (Ścieżka: {path})")
+                else:
+                    print("Drzewo jest puste.")
 
-        elif option == '5':
-            print(f"Drzewo w porzadku pre-order: {tree.print_pre_order()}")
+            elif choice == "3":
+                max_value, path = tree.find_max()
+                print(f"Największy element: {max_value} (Ścieżka: {path})")
 
-        elif option == '6':
-            print(f"Drzewo w porzadku post-order: {tree.print_post_order()}")
+            elif choice == "4":
+                key = int(input("Podaj wartość klucza do usunięcia: "))
+                tree.root = tree.delete(tree.root, key)
+                print(f"Usunięto element {key}")
 
-        elif option == '7':
-            tree.root = None
-            print("Cale drzewo zostalo usuniete.")
+            elif choice == "5":
+                print("Drzewo w porządku in-order: ", end="") 
+                tree.inorder(tree.root)
+                print()
 
-        elif option == '8':
-            print("Rownowazenie drzewa.")
+            elif choice == "6":
+                print("Drzewo w porządku pre-order: ", end="") 
+                tree.preorder(tree.root)
+                print()
 
-        elif option == '9':
-            print("Koncze program.")
-            break
+            elif choice == "7":
+                print("Usuwanie całego drzewa...")
+                tree.delete_tree(tree.root)
+                tree.root = None
 
-        else:
-            print("Nieprawidlowa opcja!")
+            elif choice == "8":
+                tree.dsw_balance()
+                print("Drzewo zostało zbalansowane metodą DSW")
 
+            elif choice == "9":
+                print("Wyjście z programu...")
+                break
 
-#if __name__ == "__main__":
-    #menu()
+            else:
+                print("Nieprawidłowy wybór. Spróbuj ponownie.")
+
+        except Exception as e:
+            print(f"Błąd: {e}")
