@@ -20,5 +20,6 @@ while temp:
         print("Koncze program")
         temp = False    
     else: 
+        os.system("cls")
         print("Zły wybór, wybierz ponownie")
         

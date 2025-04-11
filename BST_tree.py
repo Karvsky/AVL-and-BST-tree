@@ -5,7 +5,6 @@ class Node:
         self.left = None
         self.right = None
         self.key = key
-        self.height = 1 
 
 class BSTree:
     def __init__(self):
@@ -144,13 +143,11 @@ class BSTree:
 
     def dsw_balance(self):
         if not self.root: print("Drzewo jest puste...") ; return
-        print("Balansowanie DSW..."); print(" Faza 1...")
+        print("Balansowanie DSW...")
         count = self._tree_to_vine()
-        print(f"  Winorośl: {count} węzłów."); print(" Faza 2...")
         self._vine_to_tree(count)
         print("Balansowanie zakończone.")
 
-# --- Menu dla BST (bez try...except) ---
 def is_valid_int(s):
     s = s.strip()
     if not s: return False
@@ -182,7 +179,7 @@ def bst_menu():
              if is_valid_int(key_str):
                  key = int(key_str)
                  if tree.root:
-                     root_before = tree.root; print(f"Próba usunięcia {key}...")
+                     root_before = tree.root;
                      tree.root = tree.delete(tree.root, key)
                      if not tree.root and root_before is not None: print(f"Drzewo puste (usunięto {key}?).")
                      else: print(f"Zakończono operację dla {key}.")
@@ -196,18 +193,18 @@ def bst_menu():
             os.system("cls")
             if tree.root: print("Pre-order: ", end=""); tree.preorder(tree.root); print()
             else: print("Drzewo puste.")
-        elif choice == "7": # Nowa opcja Post-order
+        elif choice == "7":
             os.system("cls")
             if tree.root: print("Post-order: ", end=""); tree.postorder(tree.root); print()
             else: print("Drzewo puste.")
-        elif choice == "8": # Usuń drzewo
+        elif choice == "8": 
             os.system("cls")
             if tree.root: print("Usuwanie drzewa..."); tree.delete_tree(tree.root); tree.root = None; print("Usunięto.")
             else: print("Drzewo puste.")
-        elif choice == "9": # DSW
+        elif choice == "9": 
             os.system("cls")
             tree.dsw_balance()
             if tree.root: print("Po DSW (in-order): ", end=""); tree.inorder(tree.root); print()
             else: print("Drzewo puste.")
-        elif choice == "10": os.system("cls"); print("Powrót..."); break
+        elif choice == "10": break
         else: os.system("cls"); print("Nieprawidłowy wybór.")
