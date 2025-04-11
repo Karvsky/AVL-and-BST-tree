@@ -10,9 +10,7 @@ class BSTree:
     def __init__(self):
         self.root = None
 
-    # --- Wstawianie ---
     def insert(self, node, key):
-        """Rekurencyjne wstawianie klucza do drzewa BST."""
         if not node:
             return Node(key)
         if key < node.key:
@@ -24,31 +22,24 @@ class BSTree:
         return node
 
     def add(self, key):
-        """Dodaje klucz do drzewa, zaczynając od korzenia."""
         self.root = self.insert(self.root, key)
 
-    # --- Wyszukiwanie Min/Max ---
     def get_min_value_node(self, node):
-        """Znajduje węzeł z najmniejszą wartością w poddrzewie."""
         current = node
         while current and current.left is not None: current = current.left
         return current
 
     def find_min(self):
-        """Znajduje najmniejszy klucz w całym drzewie."""
         min_node = self.get_min_value_node(self.root)
         return min_node.key if min_node else None
 
     def find_max(self):
-        """Znajduje największy klucz w całym drzewie."""
         node = self.root
         if not node: return None
         while node.right: node = node.right
         return node.key
 
-    # --- Usuwanie ---
     def delete(self, node, key):
-        """Rekurencyjne usuwanie klucza z drzewa BST."""
         if not node: return node
         if key < node.key: node.left = self.delete(node.left, key)
         elif key > node.key: node.right = self.delete(node.right, key)
@@ -60,34 +51,28 @@ class BSTree:
             node.right = self.delete(node.right, temp.key)
         return node
 
-    # --- Przechodzenie drzewa ---
     def inorder(self, node):
-        """Wypisuje klucze w porządku inorder."""
         if node:
             self.inorder(node.left)
             print(node.key, end=" ")
             self.inorder(node.right)
 
     def preorder(self, node):
-        """Wypisuje klucze w porządku preorder."""
         if node:
             print(node.key, end=" ")
             self.preorder(node.left)
             self.preorder(node.right)
 
     def postorder(self, node):
-        """Wypisuje klucze w porządku postorder."""
         if node:
             self.postorder(node.left)
             self.postorder(node.right)
             print(node.key, end=" ")
 
     def delete_tree(self, node):
-         """Rekurencyjnie usuwa poddrzewo (dla GC)."""
          if node:
              self.delete_tree(node.left)
              self.delete_tree(node.right)
-             # del node # Niekonieczne
 
     # --- Balansowanie DSW ---
     def _rotate_right(self, parent, child):
