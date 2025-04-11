@@ -9,9 +9,9 @@ while temp:
     choice = input("Wybór: ")    
     if choice == "1":
         print(menu())
-        print(create_tree_with_bisect_method())
-        print(find_max_element())
-        print(inorder_traversal())
+        #print(create_tree_with_bisect_method())
+        #print(find_max_element())
+        #print(inorder_traversal())
         temp = False    
     elif choice == '2':
         bst_menu()
